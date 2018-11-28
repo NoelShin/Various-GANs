@@ -10,6 +10,7 @@ import torch.nn as nn  # import nn module for building neural networks
 
 import numpy as np # import numpy package for matrix calculation
 from PIL import Image  # import Image module for saving image
+import matplotlib.pyplot as plt # import matplotlib.pyplot for plotting loss graph
 
 import datetime  # import datetime module for measuring time taken to train your model
 
@@ -180,6 +181,8 @@ if __name__ == '__main__':  # if this script is directly implemented(i.e., not i
     G_optim = torch.optim.Adam(G.parameters(), lr=lr, betas=(BETA_1, BETA_2))  # define Adam optimizer for the generator
     D_optim = torch.optim.Adam(D.parameters(), lr=lr, betas=(BETA_1, BETA_2))  # define Adam optimizer for the discriminator
 
+    G_loss_list = []  # an empty list for carrying G_loss
+    D_loss_list = []  # an empty list for carrying D_loss
     total_step = 0  # define a variable for counting steps
     for epoch in range(N_EPOCHS):  # for loop with designated epochs
         for i, targets in enumerate(data_loader):  # enumerate the dataset
@@ -207,6 +210,7 @@ if __name__ == '__main__':  # if this script is directly implemented(i.e., not i
             # parameters in the generator.
 
             D_loss = (real_loss + fake_loss)*0.5  # total loss for the discriminator
+            D_loss_list.append(D_loss.item())
 
             D_optim.zero_grad()  # zero the gradients of the parameters defined in the discriminator
             D_loss.backward()  # distribute gradients for the parameters defined in the discriminator
@@ -219,6 +223,7 @@ if __name__ == '__main__':  # if this script is directly implemented(i.e., not i
                 fakes = G(z)  # generate fake samples
 
                 G_loss = GAN_Loss(D(fakes), valid)  # get a generator loss. Note that we didn't detach() this time as
+                G_loss_list.append(G_loss.item())
                 # we are going to update the generator's parameters.
 
                 G_optim.zero_grad()  # zero the gradients of the parameters defined in the generator
@@ -232,3 +237,12 @@ if __name__ == '__main__':  # if this script is directly implemented(i.e., not i
                 save_image(fakes[0].detach(), path=os.path.join('Celeba_' + str(total_step)))  # save image in the path
 
     print(datetime.datetime.now() - start_time)  # print the total time taken
+    plt.figure()  # make a grid
+    plt.plot(list(range(len(D_loss_list))), D_loss_list, linestyle='--', label='D loss')  # plot D_loss_list
+    plt.plot(list(range(len(G_loss_list))), G_loss_list, linestyle='--', label='G loss')  # plot G_loss_list
+    plt.title('Celeba')  # set title as 'MNIST'
+    plt.xlabel('Iteration')  # set x axis name as 'Iteration'
+    plt.ylabel('GAN loss')  # set y axis name as 'GAN loss'
+    plt.legend()  # show labels on the graph
+    plt.savefig('GAN_MNIST.png')  # save the graph as the png file
+    plt.show()  # show the graph
