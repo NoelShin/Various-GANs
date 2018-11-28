@@ -1,5 +1,4 @@
 import os  # import os
-os.environ['CUDA_VISIBLE_DEVICES+'] = '3'
 import glob # import glob module for loading data
 import torchvision.transforms as transforms  # import transforms module for data preprocessing
 
