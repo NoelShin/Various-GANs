@@ -9,17 +9,18 @@ import torch.nn as nn  # import nn module for building neural networks
 
 import numpy as np # import numpy package for matrix calculation
 from PIL import Image  # import Image module for saving image
+import matplotlib.pyplot as plt  # import matplotlib.pyplot for plotting loss graph
 
 import datetime  # import datetime module for measuring time taken to train your model
 
-N_EPOCHS = 200  # the number of the epoch yo want
+N_EPOCHS = 200  # the number of the epoch you want
 N_DISC = 1  # how many discriminator updates you want before a update for the generator
 BATCH_SIZE = 64  # how many batchsize you want to use during learning
 lr = 0.0002  # learning rate
 BETA_1 = 0.5  # hyperparameter for Adam solver. Coefficient used for computing running averages of gradient
 BETA_2 = 0.9  # hyperparameter for Adam solver. Coefficient used for computing running averages of square of gradient
 N_WORKERS = 2  # how many CPU threads you want to use for loading data
-DIM_LATENT = 100  # how many latent dimensions you want to set
+DIM_LATENT = 10  # how many latent dimensions you want to set
 IMG_SIZE = 28  # MNIST image size, i.e. a width(or height as it has square shape) of input and output data.
 INPUT_CH = OUTPUT_CH = 1  # MNIST data is gray image which has only one channel
 SAVE_INTERVAL = 10000  # how frequent you want to save the model's image
@@ -123,7 +124,7 @@ def tensor2image(image_tensor):  # define a function for changing torch.tensor t
 def save_image(image_tensor, path, mode='png'):  # define a function for saving processed image
     np_image = tensor2image(image_tensor)  # change a torch.tensor to a numpy image
     pil_image = Image.fromarray(np_image)  # convert the numpy image to Image object
-    pil_image.save(path, mode)  # save the image with given path and mode
+    pil_image.save(path +'.png', mode)  # save the image with given path and mode
 
 
 if __name__ == '__main__':  # if this script is directly implemented(i.e., not imported), do the below codes
@@ -153,6 +154,8 @@ if __name__ == '__main__':  # if this script is directly implemented(i.e., not i
     D_optim = torch.optim.Adam(D.parameters(), lr=lr, betas=(BETA_1, BETA_2))  # define Adam optimizer for the discriminator
 
     total_step = 0  # define a variable for counting steps
+    G_loss_list = []  # an empty list for carrying G_loss
+    D_loss_list = []  # an empty list for carrying D_loss
     for epoch in range(N_EPOCHS):  # for loop with designated epochs
         for i, (targets, _) in enumerate(data_loader):  # enumerate the dataset
             total_step += 1  # add the step
@@ -179,6 +182,7 @@ if __name__ == '__main__':  # if this script is directly implemented(i.e., not i
             # parameters in the generator.
 
             D_loss = (real_loss + fake_loss)*0.5  # total loss for the discriminator
+            D_loss_list.append(D_loss.item())
 
             D_optim.zero_grad()  # zero the gradients of the parameters defined in the discriminator
             D_loss.backward()  # distribute gradients for the parameters defined in the discriminator
@@ -191,6 +195,7 @@ if __name__ == '__main__':  # if this script is directly implemented(i.e., not i
                 fakes = G(z)  # generate fake samples
 
                 G_loss = GAN_Loss(D(fakes), valid)  # get a generator loss. Note that we didn't detach() this time as
+                G_loss_list.append(G_loss.item())
                 # we are going to update the generator's parameters.
 
                 G_optim.zero_grad()  # zero the gradients of the parameters defined in the generator
@@ -204,3 +209,13 @@ if __name__ == '__main__':  # if this script is directly implemented(i.e., not i
                 save_image(fakes[0].detach(), path=os.path.join('', str(total_step)))  # save image in the path
 
     print(datetime.datetime.now() - start_time)  # print the total time taken
+    plt.figure()  # make a grid
+    plt.plot(list(range(len(D_loss_list))), D_loss_list, linestyle='--', label='D loss')  # plot D_loss_list
+    plt.plot(list(range(len(G_loss_list))), G_loss_list, linestyle='--', label='G loss')  # plot G_loss_list
+    plt.title('MNIST')  # set title as 'MNIST'
+    plt.xlabel('Iteration')  # set x axis name as 'Iteration'
+    plt.ylabel('GAN loss')  # set y axis name as 'GAN loss'
+    plt.legend()  # show labels on the graph
+    plt.savefig('GAN_MNIST.png')  # save the graph as the png file
+    plt.show()  # show the graph
+
