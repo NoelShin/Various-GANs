@@ -1,4 +1,5 @@
 import os  # import os
+os.environ['CUDA_VISIBLE_DEVICES+'] = '3'
 import glob # import glob module for loading data
 import torchvision.transforms as transforms  # import transforms module for data preprocessing
 
@@ -240,9 +241,9 @@ if __name__ == '__main__':  # if this script is directly implemented(i.e., not i
     plt.figure()  # make a grid
     plt.plot(list(range(len(D_loss_list))), D_loss_list, linestyle='--', label='D loss')  # plot D_loss_list
     plt.plot(list(range(len(G_loss_list))), G_loss_list, linestyle='--', label='G loss')  # plot G_loss_list
-    plt.title('Celeba')  # set title as 'MNIST'
+    plt.title('CelebA')  # set title as 'MNIST'
     plt.xlabel('Iteration')  # set x axis name as 'Iteration'
     plt.ylabel('GAN loss')  # set y axis name as 'GAN loss'
     plt.legend()  # show labels on the graph
-    plt.savefig('GAN_MNIST.png')  # save the graph as the png file
+    plt.savefig('GAN_CelebA.png')  # save the graph as the png file
     plt.show()  # show the graph
