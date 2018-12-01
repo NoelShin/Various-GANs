@@ -12,6 +12,7 @@ if __name__ == '__main__':
     start_time = datetime.datetime.now()
 
     opt = TrainOption().parse()
+    print(opt.is_train)
     if opt.gpu_id != '-1':
         assert torch.cuda.is_available(), print("This server does not have CUDA devices")
         USE_CUDA = True
@@ -22,6 +23,8 @@ if __name__ == '__main__':
     dataset = CustomDataset(opt)
     data_loader = torch.utils.data.DataLoader(dataset=dataset, batch_size=opt.batch_size,
                                               shuffle=opt.shuffle, num_workers=opt.n_workers)
+
+    print(len(data_loader))
 
     G = Generator(opt)
     D = Discriminator(opt)
@@ -52,7 +55,7 @@ if __name__ == '__main__':
 
     total_step = 0
     for epoch in range(opt.n_epoch):
-        for i, (input, real) in data_loader:
+        for i, (input, real) in enumerate(data_loader):
             total_step += 1
             if USE_CUDA:
                 input = input.cuda()
@@ -60,11 +63,9 @@ if __name__ == '__main__':
 
             D_optim.zero_grad()
             real_loss = GAN_loss(D(real), valid_label)
-            print("real_loss shape", real_loss.detach().shape)
 
             fake = G(input)
-            fake_loss = GAN_loss(D(fake.detach), fake_label)
-            print("fake_loss shape", fake_loss.detach().shape)
+            fake_loss = GAN_loss(D(fake.detach()), fake_label)
 
             D_loss = (real_loss + fake_loss)*0.5
             D_loss.backward()
