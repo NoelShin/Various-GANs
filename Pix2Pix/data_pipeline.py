@@ -10,8 +10,8 @@ class CustomDataset(torch.utils.data.Dataset):
     def __init__(self, opt):
         super(CustomDataset, self).__init__()
         self.opt = opt
-        self.input_path_list = glob.glob(os.path.join(self.opt.dataset_dir, 'Input', '*.' + self.opt.dataset_format))
-        self.target_path_list = glob.glob(os.path.join(self.opt.dataset_dir, 'Target', '*.' + self.opt.dataset_format))
+        self.input_path_list = sorted(glob.glob(os.path.join(self.opt.dataset_dir, 'Input', '*.' + self.opt.dataset_format)))
+        self.target_path_list = sorted(glob.glob(os.path.join(self.opt.dataset_dir, 'Target', '*.' + self.opt.dataset_format)))
 
         if self.opt.flip:
             self.flip = random.random() > 0.5
