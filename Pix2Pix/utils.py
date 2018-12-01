@@ -12,7 +12,7 @@ def weight_init(module):
         module.bias.detach().fill_(0.0)
 
 
-def block(module, normalization=True, relu=True, dropout=False):
+def block(module, normalization=True, transpose=False, relu=True, dropout=False):
     layers = []
 
     if relu:
@@ -23,7 +23,10 @@ def block(module, normalization=True, relu=True, dropout=False):
     layers.append(module)
 
     if normalization:
-        layers.append(nn.BatchNorm2d(module.weight.size()[0]))
+        if transpose:
+            layers.append(nn.BatchNorm2d(module.weight.size()[1]))
+        elif not transpose:
+            layers.append(nn.BatchNorm2d(module.weight.size()[0]))
 
     if dropout:
         layers.append(nn.Dropout2d(0.5, inplace=True))
@@ -68,7 +71,7 @@ def save_image(image_tensor, path, mode='png'):  # define a function for saving 
     pil_image = Image.fromarray(np_image)  # convert the numpy image to Image object
     pil_image.save(path + '.png', mode)  # save the image with given path and mode
 
-\
+
 
 
 
