@@ -66,8 +66,7 @@ class Generator(nn.Module):
         u3 = self.third_dblock(torch.cat([u4, d3], dim=1))  # 1x512x32x32
         u2 = self.second_dblock(torch.cat([u3, d2], dim=1))  # 1x512x64x64
         u1 = nn.ReLU()(self.first_dblock(torch.cat([u2, d1], dim=1)))  # 1x512x128x128
-        u0 = nn.ReLU()(self.last_dconv(u1))  # 1x512x256x256
-        print(u0.size())
+        u0 = nn.Tanh()(self.last_dconv(u1))  # 1x512x256x256
         return u0
 
 
