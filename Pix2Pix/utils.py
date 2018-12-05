@@ -44,12 +44,16 @@ def img2hist(path, space='RGB'):
         s = color2hist(s)
         v = color2hist(v)
         
+        return h, s, v
+
     elif space == 'YCbCr' or 'YCrCb':
         image = cv2.cvtColor(image, cv2.COLOR_BGR2YCrCb)
         Y, Cr, Cb = cv2.split(image)
         Y = color2hist(Y)
         Cr = color2hist(Cr)
         Cb = color2hist(Cb)
+        
+        return Y, Cr, Cb
 
 
 def weight_init(module):
