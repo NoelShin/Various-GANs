@@ -1,5 +1,6 @@
 import torch.nn as nn
 import numpy as np
+import matplotlib.pyplot as plt
 from PIL import Image
 import cv2
 
@@ -29,12 +30,27 @@ def img2hist(path, space='RGB'):
 
     elif space == 'LAB':
         image = cv2.cvtColor(image, cv2.COLOR_BGR2LAB)
+        l, a, b = cv2.split(image)
+        l = color2hist(l)
+        a = color2hist(a)
+        b = color2hist(b)
+
+        return l, a, b
 
     elif space == 'HSV':
         image = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
-
+        h, s, v = cv2.split(image)
+        h = color2hist(h)
+        s = color2hist(s)
+        v = color2hist(v)
+        
     elif space == 'YCbCr' or 'YCrCb':
         image = cv2.cvtColor(image, cv2.COLOR_BGR2YCrCb)
+        Y, Cr, Cb = cv2.split(image)
+        Y = color2hist(Y)
+        Cr = color2hist(Cr)
+        Cb = color2hist(Cb)
+
 
 def weight_init(module):
     class_name = module.__class__.__name__
@@ -70,7 +86,7 @@ def block(module, normalization=True, transpose=False, relu=True, dropout=False)
 
 def get_grid_shape(opt):
     assert opt.patch_size in [1, 16, 70, 286]
-    patch_to_grid_dict = {70: (30, 30)}
+    patch_to_grid_dict = {1: (256, 256), 16: (62, 62), 70: (30, 30), 286: (6, 6)}
 
     return (opt.batch_size, 1, *patch_to_grid_dict[opt.patch_size])
 
@@ -100,12 +116,7 @@ def tensor2image(image_tensor):  # define a function for changing torch.tensor t
     return np_image  # return the processed image
 
 
-def save_image(image_tensor, path, mode='png'):  # define a function for saving processed image
+def save_image(image_tensor, path):  # define a function for saving processed image
     np_image = tensor2image(image_tensor)  # change a torch.tensor to a numpy image
     pil_image = Image.fromarray(np_image)  # convert the numpy image to Image object
-    pil_image.save(path + '.png', mode)  # save the image with given path and mode
-
-
-
-
-
+    pil_image.save(path + '.png', mode='PNG')  # save the image with given path and mode
