@@ -1,6 +1,40 @@
 import torch.nn as nn
 import numpy as np
 from PIL import Image
+import cv2
+
+def color2hist(color):
+    color = np.asarray(color).flatten()
+    padding_width = 255 - np.max(color)
+    color = plt.hist(color, bins=np.max(color))[0]
+    color /= sum(color)
+    color = np.asarray(color)
+    color = np.pad(color, [0, padding_width], mode='constant', constant_values=0)
+
+    return color
+
+
+def img2hist(path, space='RGB'):
+    assert space in ['RGB', 'LAB']
+    image = cv2.imread(path)
+
+    if space == 'RGB':
+        image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        r, g, b = cv2.split(image)
+        r = color2hist(r)
+        g = color2hist(g)
+        b = color2hist(b)
+
+        return r, g, b
+
+    elif space == 'LAB':
+        image = cv2.cvtColor(image, cv2.COLOR_BGR2LAB)
+
+    elif space == 'HSV':
+        image = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
+
+    elif space == 'YCbCr' or 'YCrCb':
+        image = cv2.cvtColor(image, cv2.COLOR_BGR2YCrCb)
 
 def weight_init(module):
     class_name = module.__class__.__name__
