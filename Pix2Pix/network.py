@@ -81,22 +81,63 @@ class Discriminator(nn.Module):
         input_channel = self.opt.output_channel
         n_df = self.opt.n_df
 
-        self.conv_1 = nn.Conv2d(input_channel, n_df, kernel_size=4, padding=1, stride=2, bias=False)  # 1x64x128x128
-        self.conv_2 = nn.Conv2d(n_df, 2 * n_df, kernel_size=4, padding=1, stride=2, bias=False)  # 1x128x64x64
-        self.conv_3 = nn.Conv2d(2 * n_df, 4 * n_df, kernel_size=4, padding=1, stride=2, bias=False)  # 1x256x32x32
-        self.conv_4 = nn.Conv2d(4 * n_df, 8 * n_df, kernel_size=4, padding=1, stride=1, bias=False)  # 1x512x31x31
-        self.conv_5 = nn.Conv2d(8 * n_df, 1, kernel_size=4, padding=1, stride=1, bias=False)  # 1x512x30x30
+        if self.opt.patch_size == 1:
+            self.conv_1 = nn.Conv2d(input_channel, n_df, kernel_size=1, padding=0, stride=1, bias=False)
+            self.conv_2 = nn.Conv2d(n_df, 2*n_df, kernel_size=1, padding=0, stride=1, bias=False)
+            self.conv_3 = nn.Conv2d(2*n_df, 1, kernel_size=1, padding=0, stride=1, bias=False)
+
+        else:
+            self.conv_1 = nn.Conv2d(input_channel, n_df, kernel_size=4, padding=1, stride=2, bias=False)  # 1x64x128x128
+            if self.opt.patch_size == 16:
+                self.conv_2 = nn.Conv2d(n_df, 2*n_df, kernel_size=4, padding=1, stride=2, bias=False)
+                self.conv_3 = nn.Conv2d(2*n_df, 4*n_df, kernel_size=4, padding=1, stride=1, bias=False)
+                self.conv_4 = nn.Conv2d(4*n_df, 1, kernel_size=4, padding=1, stride=1, bias=False)
+
+            elif self.opt.patch_size == 70:
+                self.conv_2 = nn.Conv2d(n_df, 2 * n_df, kernel_size=4, padding=1, stride=2, bias=False)  # 1x128x64x64
+                self.conv_3 = nn.Conv2d(2 * n_df, 4 * n_df, kernel_size=4, padding=1, stride=2, bias=False)  # 1x256x32x32
+                self.conv_4 = nn.Conv2d(4 * n_df, 8 * n_df, kernel_size=4, padding=1, stride=1, bias=False)  # 1x512x31x31
+                self.conv_5 = nn.Conv2d(8 * n_df, 1, kernel_size=4, padding=1, stride=1, bias=False)  # 1x512x30x30
+
+            elif self.opt.patch_size == 286:
+                self.conv_2 = nn.Conv2d(n_df, 2 * n_df, kernel_size=4, padding=1, stride=2, bias=False)  # 1x128x64x64
+                self.conv_3 = nn.Conv2d(2 * n_df, 4 * n_df, kernel_size=4, padding=1, stride=2, bias=False)  # 1x256x32x32
+                self.conv_4 = nn.Conv2d(4 * n_df, 8 * n_df, kernel_size=4, padding=1, stride=2, bias=False)  # 1x512x31x31
+                self.conv_5 = nn.Conv2d(8 * n_df, 8 * n_df, kernel_size=4, padding=1, stride=2, bias=False)  # 1x512x30x30
+                self.conv_6 = nn.Conv2d(8 * n_df, 8 * n_df, kernel_size=4, padding=1, stride=1, bias=False)
+                self.conv_7 = nn.Conv2d(8 * n_df, 1, kernel_size=4, padding=1, stride=1, bias=False)
 
     def build_model(self):
         self.model = nn.Sequential()
+
         self.model.add_module('first_conv', self.conv_1)
+        if self.opt.patch_size == 1:
+            self.model.add_module('first_block', block(self.conv_2, relu=False))
+            self.model.add_module('last_leaky', nn.LeakyReLU(0.2, inplace=True))
+            self.model.add_module('last_conv', self.conv_3)
 
-        self.model.add_module('first_block', block(self.conv_2, relu=False))
-        self.model.add_module('second_block', block(self.conv_3, relu=False))
-        self.model.add_module('third_block', block(self.conv_4, relu=False))
+        elif self.opt.patch_size == 16:
+            self.model.add_module('first_block', block(self.conv_2, relu=False))
+            self.model.add_module('second_block', block(self.conv_3, relu=False))
+            self.model.add_module('last_leaky', nn.LeakyReLU(0.2, inplace=True))
+            self.model.add_module('last_conv', self.conv_4)
 
-        self.model.add_module('last_leaky', nn.LeakyReLU(0.2, inplace=True))
-        self.model.add_module('last_conv', self.conv_5)
+        elif self.opt.patch_size == 70:
+            self.model.add_module('first_block', block(self.conv_2, relu=False))
+            self.model.add_module('second_block', block(self.conv_3, relu=False))
+            self.model.add_module('third_block', block(self.conv_4, relu=False))
+            self.model.add_module('last_leaky', nn.LeakyReLU(0.2, inplace=True))
+            self.model.add_module('last_conv', self.conv_5)
+
+        elif self.opt.patch_size == 286:
+            self.model.add_module('first_block', block(self.conv_2, relu=False))
+            self.model.add_module('second_block', block(self.conv_3, relu=False))
+            self.model.add_module('third_block', block(self.conv_4, relu=False))
+            self.model.add_module('fourth_block', block(self.conv_5, relu=False))
+            self.model.add_module('fifth_block', block(self.conv_6, relu=False))
+            self.model.add_module('last_leaky', nn.LeakyReLU(0.2, inplace=True))
+            self.model.add_module('last_conv', self.conv_7)
+
         self.model.add_module('sigmoid', nn.Sigmoid())
 
     def forward(self, x):
