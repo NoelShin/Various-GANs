@@ -43,7 +43,7 @@ def img2hist(path, space='RGB'):
         h = color2hist(h)
         s = color2hist(s)
         v = color2hist(v)
-        
+
         return h, s, v
 
     elif space == 'YCbCr' or 'YCrCb':
@@ -52,7 +52,7 @@ def img2hist(path, space='RGB'):
         Y = color2hist(Y)
         Cr = color2hist(Cr)
         Cb = color2hist(Cb)
-        
+
         return Y, Cr, Cb
 
 
