@@ -9,4 +9,5 @@ Belows are packages you need to implement GAN.
 4. matplotlib
 
 You can download the packages with below command
-"pip install torch, torchvision, Pillow, matplotlib"
+
+pip install torch, torchvision, Pillow, matplotlib
