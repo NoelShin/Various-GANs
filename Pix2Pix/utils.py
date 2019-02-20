@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 from PIL import Image
 import cv2
 
+
 def color2hist(color):
     color = np.asarray(color).flatten()
     padding_width = 255 - np.max(color)
