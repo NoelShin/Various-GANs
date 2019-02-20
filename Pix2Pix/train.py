@@ -12,7 +12,6 @@ if __name__ == '__main__':
     start_time = datetime.datetime.now()
 
     opt = TrainOption().parse()
-    print(opt.is_train)
     if opt.gpu_id != '-1':
         assert torch.cuda.is_available(), print("This server does not have CUDA devices")
         USE_CUDA = True
@@ -55,6 +54,7 @@ if __name__ == '__main__':
 
     total_step = 0
     for epoch in range(opt.n_epoch):
+        epoch += 1
         for i, (input, real) in enumerate(data_loader):
             total_step += 1
             if USE_CUDA:
@@ -67,30 +67,30 @@ if __name__ == '__main__':
             fake = G(input)
             fake_loss = GAN_loss(D(fake.detach()), fake_label)
 
-            D_loss = (real_loss + fake_loss)*0.5
+            D_loss = (real_loss + fake_loss) * 0.5
             D_loss.backward()
             D_optim.step()
 
             G_optim.zero_grad()
-            G_loss = opt.L1_lambda*L1_loss(fake, real) + GAN_loss(D(fake), valid_label)
+            G_loss = opt.L1_lambda * L1_loss(fake, real) + GAN_loss(D(fake), valid_label)
             G_loss.backward()
             G_optim.step()
 
             if total_step % opt.report_freq == 0:
                 print("Epoch: {} [{}/{}, {:.{prec}}%], G_loss: {:.{prec}}, D_loss: {:.{prec}}"
-                         .format(epoch, i, len(data_loader), float(i/len(data_loader))*100,
-                                 G_loss.item(), D_loss.item(), prec=4))
+                      .format(epoch, i, len(data_loader), float(i/len(data_loader)) * 100,
+                              G_loss.item(), D_loss.item(), prec=4))
 
             if total_step % opt.display_freq == 0:
                 save_image(fake, os.path.join(opt.checkpoint_dir, 'fake_{}.png'.format(total_step)))
                 save_image(real, os.path.join(opt.checkpoint_dir, 'real_{}.png'.format(total_step)))
 
-            if total_step % opt.save_freq == 0:
-                torch.save(G.state_dict(), os.path.join(opt.checkpoint_dir, 'G_{}'.format(total_step)))
-                torch.save(D.state_dict(), os.path.join(opt.checkpoint_dir, 'D_{}'.format(total_step)))
-
             if opt.debug:
                 break
+
+        if total_step % opt.save_freq == 0:
+            torch.save(G.state_dict(), os.path.join(opt.checkpoint_dir, 'G_{}'.format(epoch)))
+            torch.save(D.state_dict(), os.path.join(opt.checkpoint_dir, 'D_{}'.format(epoch)))
 
         if opt.debug:
             break
