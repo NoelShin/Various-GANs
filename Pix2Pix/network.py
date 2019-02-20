@@ -1,4 +1,5 @@
 import torch
+import torch.nn as nn
 from math import log2
 from utils import *
 
@@ -32,11 +33,11 @@ class Generator(nn.Module):
 
             elif idx_max_ch < i < n_downsample - 4:
                 down_block = [act_down, nn.Conv2d(n_gf, n_gf, kernel_size=4, padding=1, stride=2, bias=False),
-                              norm(2 * n_gf)]
+                              norm(n_gf)]
                 up_block = [act_up, nn.ConvTranspose2d(2 * n_gf, n_gf, kernel_size=4, padding=1, stride=2, bias=False),
                             norm(n_gf)]
 
-            elif n_downsample - 4 <= i < n_downsample - 2:
+            elif n_downsample - 4 <= i < n_downsample - 1:
                 down_block = [act_down, nn.Conv2d(n_gf, n_gf, kernel_size=4, padding=1, stride=2, bias=False),
                               norm(n_gf)]
                 up_block = [act_up, nn.ConvTranspose2d(2 * n_gf, n_gf, kernel_size=4, padding=1, stride=2, bias=False),
@@ -49,7 +50,7 @@ class Generator(nn.Module):
 
             self.add_module('Down_block_{}'.format(i), nn.Sequential(*down_block))
             self.add_module('Up_block_{}'.format(i), nn.Sequential(*up_block))
-            n_gf *= 2 if n_gf < max_ch else None
+            n_gf *= 2 if n_gf < max_ch and i != 0 else 1
 
         self.n_downsample = n_downsample
 
@@ -58,8 +59,8 @@ class Generator(nn.Module):
         for i in range(self.n_downsample):
             layers += [getattr(self, 'Down_block_{}'.format(i))(layers[-1])]
         x = getattr(self, 'Up_block_{}'.format(self.n_downsample - 1))(layers[-1])
-        for i in range(self.n_downsample - 2, -1, -1):
-            x = getattr(self, 'Up_block_{}'.format(i))(torch.cat([x, layers[i]], dim=1))
+        for i in range(self.n_downsample - 1, 0, -1):
+            x = getattr(self, 'Up_block_{}'.format(i - 1))(torch.cat([x, layers[i]], dim=1))
         return x
 
 
