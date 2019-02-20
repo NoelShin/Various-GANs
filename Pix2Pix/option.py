@@ -1,23 +1,23 @@
 import os
 import argparse
-from utils import configure
+
 
 class BaseOption(object):
     def __init__(self):
         self.parser = argparse.ArgumentParser()
 
-        self.parser.add_argument('--debug', action='store_true', default=True)
+        self.parser.add_argument('--debug', action='store_true', default=False)
         self.parser.add_argument('--gpu_id', type=str, default='3')
 
         self.parser.add_argument('--batch_size', type=int, default=1)
         self.parser.add_argument('--checkpoints_dir', type=str, default='./checkpoints')
         self.parser.add_argument('--color_space', type=str, default='HSV')
-        self.parser.add_argument('--dataset_dir', type=str, default='./dataset')
+        self.parser.add_argument('--dataset_dir', type=str, default='/home/tlsruddls/Desktop/Projects/LIT/datasets')
         self.parser.add_argument('--dataset_format', type=str, default='png')
-        self.parser.add_argument('--dataset_name', type=str, default='cityscape')
+        self.parser.add_argument('--dataset_name', type=str, default='Cityscapes')
         self.parser.add_argument('--image_height', type=int, default=1024)
-        self.parser.add_argument('--input_channel', type=int, default=35)  # For cityscape dataset whose label numbers are 35.
-        self.parser.add_argument('--output_channel', type=int, default=3)  # RGB
+        self.parser.add_argument('--input_ch', type=int, default=35)  # For cityscapes dataset whose label numbers are 35.
+        self.parser.add_argument('--output_ch', type=int, default=3)  # RGB
         self.parser.add_argument('--max_ch', type=int, default=2**9)
         self.parser.add_argument('--n_df', type=int, default=64, help='# of channels for the first layer in D')
         self.parser.add_argument('--n_gf', type=int, default=64, help='# of channels for the first layer in G')
@@ -30,10 +30,10 @@ class BaseOption(object):
         if opt.is_train:
             opt.checkpoints_dir = os.path.join(opt.checkpoints_dir, opt.dataset_name, model_name)
             os.makedirs(opt.checkpoints_dir) if not os.path.isdir(opt.checkpoints_dir) else None
-            opt.dataset_dir = os.path.join(opt.dataset_dir, opt.dataset_name)
+            opt.dataset_dir = os.path.join(opt.dataset_dir, opt.dataset_name, 'Train')
             assert os.path.isdir(opt.dataset_dir), print('There is no {} directory.'.format(opt.dataset_dir))
 
-            log_path = os.path.join(opt.checkpoints_dir, 'Model', 'opt.txt')
+            log_path = os.path.join(opt.checkpoints_dir, 'opt.txt')
 
             if os.path.isfile(log_path) and not opt.debug:
                 permission = input(
@@ -73,7 +73,7 @@ class TrainOption(BaseOption):
 
         self.parser.add_argument('--beta1', type=float, default=0.5)
         self.parser.add_argument('--beta2', type=float, default=0.999)
-        self.parser.add_argument('--display_freq', type=int, default=500)
+        self.parser.add_argument('--display_freq', type=int, default=50)
         self.parser.add_argument('--flip', action='store_true', default=True)
         self.parser.add_argument('--is_train', action='store_true', default=True)
         self.parser.add_argument('--L1_lambda', type=int, default=10)
