@@ -81,18 +81,18 @@ class Discriminator(nn.Module):
         elif patch_size == 16:
             model = [nn.Conv2d(input_ch, n_df, kernel_size=4, padding=1, stride=2, bias=False), act]
             model += [nn.Conv2d(n_df, 2 * n_df, kernel_size=4, padding=1, stride=2, bias=False), norm(2 * n_df), act]
-            model += [nn.Conv2d(2 * n_df, 4 * n_df, kernel_size=4, padding=1, stride=1, bias=False), norm(4 * n_df),
+            model += [nn.Conv2d(2 * n_df, 4 * n_df, kernel_size=4, padding=1, bias=False), norm(4 * n_df),
                       act]
-            model += [nn.Conv2d(4 * n_df, 1, kernel_size=4, padding=1, stride=1, bias=False)]
+            model += [nn.Conv2d(4 * n_df, 1, kernel_size=4, bias=False)]
 
         elif patch_size == 70:
             model = [nn.Conv2d(input_ch, n_df, kernel_size=4, padding=1, stride=2, bias=False), act]
             model += [nn.Conv2d(n_df, 2 * n_df, kernel_size=4, padding=1, stride=2, bias=False), norm(2 * n_df), act]
             model += [nn.Conv2d(2 * n_df, 4 * n_df, kernel_size=4, padding=1, stride=2, bias=False), norm(4 * n_df),
                       act]
-            model += [nn.Conv2d(4 * n_df, 8 * n_df, kernel_size=4, padding=1, stride=1, bias=False), norm(8 * n_df),
+            model += [nn.Conv2d(4 * n_df, 8 * n_df, kernel_size=4, padding=1, bias=False), norm(8 * n_df),
                       act]
-            model += [nn.Conv2d(8 * n_df, 1, kernel_size=4, padding=1, stride=1, bias=False)]
+            model += [nn.Conv2d(8 * n_df, 1, kernel_size=4, bias=False)]
 
         elif patch_size == 286:
             model = [nn.Conv2d(input_ch, n_df, kernel_size=4, padding=1, stride=2, bias=False), act]
@@ -101,8 +101,8 @@ class Discriminator(nn.Module):
                       act]
             model += [nn.Conv2d(4 * n_df, 8 * n_df, kernel_size=4, padding=1, stride=2, bias=False), norm(8 * n_df),
                       act]
-            model += [nn.Conv2d(8 * n_df, 8 * n_df, kernel_size=4, padding=1, stride=1, bias=False), norm(8 * n_df)]
-            model += [nn.Conv2d(8 * n_df, 1, kernel_size=4, padding=1, stride=1, bias=False)]
+            model += [nn.Conv2d(8 * n_df, 8 * n_df, kernel_size=4, padding=1, bias=False), norm(8 * n_df)]
+            model += [nn.Conv2d(8 * n_df, 1, kernel_size=4, bias=False)]
 
         else:
             raise NotImplementedError("Invalid patch size {}. Please choose among [1, 16, 70, 286].".format(patch_size))
