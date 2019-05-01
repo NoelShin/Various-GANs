@@ -1,5 +1,5 @@
 # Various-GANs
-Various GANs implementation
+Various GANs simpler and trustful implementation
 
 # Prerequisites
 Belows are packages you need to implement GAN.
