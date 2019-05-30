@@ -1,5 +1,5 @@
-# Various-GANs
-Various GANs simpler and trustful PyTorch implementation - CycleGAN, cGAN, DCGAN, GAN, Pix2Pix, SGAN
+# Various-GANs - CycleGAN, cGAN, DCGAN, GAN, Pix2Pix, SGAN
+Various GANs simpler and trustful PyTorch implementation.
 
 # Prerequisites
 Belows are packages you need to implement GAN.
