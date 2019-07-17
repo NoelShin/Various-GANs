@@ -53,7 +53,7 @@ if __name__ == '__main__':
             fake = G(z)
             real = data[0].view(BATCH_SIZE, -1)
 
-            loss_D = -torch.mean(torch.log(D(real)) + torch.log(1 - D(fake.detach())))
+            loss_D = -torch.mean(torch.log(D(real)) - torch.log(1 - D(fake.detach())))
             optim_D.zero_grad()
             loss_D.backward()
             optim_D.step()
