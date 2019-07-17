@@ -52,7 +52,7 @@ if __name__ == '__main__':
             fake = G(z, one_hot)
             # fake = G(one_hot)
 
-            loss_D = -torch.mean(torch.log(D(real, one_hot)) + torch.log(1 - D(fake.detach(), one_hot)))
+            loss_D = -torch.mean(torch.log(D(real, one_hot)) - torch.log(1 - D(fake.detach(), one_hot)))
             optim_D.zero_grad()
             loss_D.backward()
             optim_D.step()
