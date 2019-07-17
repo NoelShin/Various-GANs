@@ -46,13 +46,13 @@ if __name__ == '__main__':
             fake = G(z)
             real = data[0].view(BATCH_SIZE, -1)
 
-            loss_D = -torch.mean(torch.log(D(real)) + torch.log(1 - D(fake.detach())))
+            loss_D = -torch.mean(torch.log(D(real)) - torch.log(1 - D(fake.detach())))
             optim_D.zero_grad()
             loss_D.backward()
             optim_D.step()
 
             loss_G = -torch.mean(torch.log(D(fake)))  # Non saturating loss
-            # For saturaing loss, loss_G = torch.mean(torch.log(1-D(fake)))
+            # For saturaing loss, loss_G = -torch.mean(torch.log(1-D(fake)))
             optim_G.zero_grad()
             loss_G.backward()
             optim_G.step()
