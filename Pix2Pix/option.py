@@ -8,11 +8,12 @@ class BaseOption(object):
 
         self.parser.add_argument('--debug', action='store_true', default=False)
         self.parser.add_argument('--gpu_id', type=str, default='3')
-
+        self.parser.add_argument('--patch_size', type=int, default=70, help='effective receptive field of Discriminator')
+        
         self.parser.add_argument('--batch_size', type=int, default=1)
         self.parser.add_argument('--checkpoints_dir', type=str, default='./checkpoints')
-        self.parser.add_argument('--color_space', type=str, default='HSV')
-        self.parser.add_argument('--dataset_dir', type=str, default='/home/tlsruddls/Desktop/Projects/LIT/datasets')
+        self.parser.add_argument('--color_space', type=str, default='RGB')
+        self.parser.add_argument('--dataset_dir', type=str, default='./datasets')
         self.parser.add_argument('--dataset_format', type=str, default='png')
         self.parser.add_argument('--dataset_name', type=str, default='Cityscapes')
         self.parser.add_argument('--image_height', type=int, default=1024)
@@ -22,7 +23,6 @@ class BaseOption(object):
         self.parser.add_argument('--n_df', type=int, default=64, help='# of channels for the first layer in D')
         self.parser.add_argument('--n_gf', type=int, default=64, help='# of channels for the first layer in G')
         self.parser.add_argument('--n_workers', type=int, default=2, help='# of threads for loading data')
-        self.parser.add_argument('--patch_size', type=int, default=70, help='effective receptive field of D')
 
     def parse(self):
         opt = self.parser.parse_args()
@@ -32,6 +32,9 @@ class BaseOption(object):
             os.makedirs(opt.checkpoints_dir) if not os.path.isdir(opt.checkpoints_dir) else None
             opt.dataset_dir = os.path.join(opt.dataset_dir, opt.dataset_name, 'Train')
             assert os.path.isdir(opt.dataset_dir), print('There is no {} directory.'.format(opt.dataset_dir))
+            
+            if opt.dataset_name != 'Cityscapes':
+                opt.flip = False
 
             log_path = os.path.join(opt.checkpoints_dir, 'opt.txt')
 
