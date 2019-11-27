@@ -60,7 +60,8 @@ class BaseOption(object):
                 log.close()
 
         else:
-            opt.test_image_dir = os.path.join(opt.results)
+            opt.test_image_dir = os.path.join(opt.checkpoints_dir, opt.dataset_name, "Test", model_name)
+            os.makedirs(opt.test_image_dir) if not os.path.isdir(opt.test_image_dir) else None
 
         if opt.debug:
             opt.report_freq = 1
