@@ -48,6 +48,7 @@ class TrainOption(BaseOption):
     def __init__(self):
         super(TrainOption, self).__init__()
         self.args.add_argument('--is_train', type=bool, default=True)
+        self.args.add_argument('--load_size', type=int, default=256, help="The size of images for training")
 
         self.args.add_argument('--beta_1', type=float, default=0.5, help='Adam optimizer param.')
         self.args.add_argument('--beta_2', type=float, default=0.999, help='Adam optimizer param.')
